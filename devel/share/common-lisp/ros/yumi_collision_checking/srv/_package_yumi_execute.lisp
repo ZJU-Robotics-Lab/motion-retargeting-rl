@@ -1,8 +1,10 @@
 (cl:in-package yumi_collision_checking-srv)
 (cl:export '(COMMAND-VAL
           COMMAND
-          QT-VAL
-          QT
+          QTT_HAT-VAL
+          QTT_HAT
+          VT_HAT-VAL
+          VT_HAT
           GROUP_NAME-VAL
           GROUP_NAME
           T-VAL

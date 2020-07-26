@@ -20,28 +20,33 @@
 
 (defclass yumi_collision_checking::yumi_executeRequest
   :super ros::object
-  :slots (_command _Qt _group_name _t ))
+  :slots (_command _Qtt_hat _Vt_hat _group_name _t ))
 
 (defmethod yumi_collision_checking::yumi_executeRequest
   (:init
    (&key
     ((:command __command) "")
-    ((:Qt __Qt) (make-array 0 :initial-element 0.0 :element-type :float))
+    ((:Qtt_hat __Qtt_hat) (make-array 0 :initial-element 0.0 :element-type :float))
+    ((:Vt_hat __Vt_hat) (make-array 0 :initial-element 0.0 :element-type :float))
     ((:group_name __group_name) "")
     ((:t __t) 0)
     )
    (send-super :init)
    (setq _command (string __command))
-   (setq _Qt __Qt)
+   (setq _Qtt_hat __Qtt_hat)
+   (setq _Vt_hat __Vt_hat)
    (setq _group_name (string __group_name))
    (setq _t (round __t))
    self)
   (:command
    (&optional __command)
    (if __command (setq _command __command)) _command)
-  (:Qt
-   (&optional __Qt)
-   (if __Qt (setq _Qt __Qt)) _Qt)
+  (:Qtt_hat
+   (&optional __Qtt_hat)
+   (if __Qtt_hat (setq _Qtt_hat __Qtt_hat)) _Qtt_hat)
+  (:Vt_hat
+   (&optional __Vt_hat)
+   (if __Vt_hat (setq _Vt_hat __Vt_hat)) _Vt_hat)
   (:group_name
    (&optional __group_name)
    (if __group_name (setq _group_name __group_name)) _group_name)
@@ -53,8 +58,10 @@
    (+
     ;; string _command
     4 (length _command)
-    ;; float64[] _Qt
-    (* 8    (length _Qt)) 4
+    ;; float64[] _Qtt_hat
+    (* 8    (length _Qtt_hat)) 4
+    ;; float64[] _Vt_hat
+    (* 8    (length _Vt_hat)) 4
     ;; string _group_name
     4 (length _group_name)
     ;; int64 _t
@@ -66,10 +73,15 @@
               (make-string-output-stream (send self :serialization-length)))))
      ;; string _command
        (write-long (length _command) s) (princ _command s)
-     ;; float64[] _Qt
-     (write-long (length _Qt) s)
-     (dotimes (i (length _Qt))
-       (sys::poke (elt _Qt i) (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
+     ;; float64[] _Qtt_hat
+     (write-long (length _Qtt_hat) s)
+     (dotimes (i (length _Qtt_hat))
+       (sys::poke (elt _Qtt_hat i) (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
+       )
+     ;; float64[] _Vt_hat
+     (write-long (length _Vt_hat) s)
+     (dotimes (i (length _Vt_hat))
+       (sys::poke (elt _Vt_hat i) (send s :buffer) (send s :count) :double) (incf (stream-count s) 8)
        )
      ;; string _group_name
        (write-long (length _group_name) s) (princ _group_name s)
@@ -91,12 +103,19 @@
    (buf &optional (ptr- 0))
    ;; string _command
      (let (n) (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4) (setq _command (subseq buf ptr- (+ ptr- n))) (incf ptr- n))
-   ;; float64[] _Qt
+   ;; float64[] _Qtt_hat
    (let (n)
      (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
-     (setq _Qt (instantiate float-vector n))
+     (setq _Qtt_hat (instantiate float-vector n))
      (dotimes (i n)
-     (setf (elt _Qt i) (sys::peek buf ptr- :double)) (incf ptr- 8)
+     (setf (elt _Qtt_hat i) (sys::peek buf ptr- :double)) (incf ptr- 8)
+     ))
+   ;; float64[] _Vt_hat
+   (let (n)
+     (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4)
+     (setq _Vt_hat (instantiate float-vector n))
+     (dotimes (i n)
+     (setf (elt _Vt_hat i) (sys::peek buf ptr- :double)) (incf ptr- 8)
      ))
    ;; string _group_name
      (let (n) (setq n (sys::peek buf ptr- :integer)) (incf ptr- 4) (setq _group_name (subseq buf ptr- (+ ptr- n))) (incf ptr- n))
@@ -271,7 +290,7 @@
   :super ros::object
   :slots ())
 
-(setf (get yumi_collision_checking::yumi_execute :md5sum-) "b1adf680c6857c95eac390b17b06c828")
+(setf (get yumi_collision_checking::yumi_execute :md5sum-) "b54a140b3b42b89260ec4d48caa4f3e6")
 (setf (get yumi_collision_checking::yumi_execute :datatype-) "yumi_collision_checking/yumi_execute")
 (setf (get yumi_collision_checking::yumi_execute :request) yumi_collision_checking::yumi_executeRequest)
 (setf (get yumi_collision_checking::yumi_execute :response) yumi_collision_checking::yumi_executeResponse)
@@ -279,11 +298,12 @@
 (defmethod yumi_collision_checking::yumi_executeRequest
   (:response () (instance yumi_collision_checking::yumi_executeResponse :init)))
 
-(setf (get yumi_collision_checking::yumi_executeRequest :md5sum-) "b1adf680c6857c95eac390b17b06c828")
+(setf (get yumi_collision_checking::yumi_executeRequest :md5sum-) "b54a140b3b42b89260ec4d48caa4f3e6")
 (setf (get yumi_collision_checking::yumi_executeRequest :datatype-) "yumi_collision_checking/yumi_executeRequest")
 (setf (get yumi_collision_checking::yumi_executeRequest :definition-)
       "string command
-float64[] Qt
+float64[] Qtt_hat
+float64[] Vt_hat
 string group_name
 int64 t
 ---
@@ -296,11 +316,12 @@ float64[] Q_next
 float64 if_collide
 ")
 
-(setf (get yumi_collision_checking::yumi_executeResponse :md5sum-) "b1adf680c6857c95eac390b17b06c828")
+(setf (get yumi_collision_checking::yumi_executeResponse :md5sum-) "b54a140b3b42b89260ec4d48caa4f3e6")
 (setf (get yumi_collision_checking::yumi_executeResponse :datatype-) "yumi_collision_checking/yumi_executeResponse")
 (setf (get yumi_collision_checking::yumi_executeResponse :definition-)
       "string command
-float64[] Qt
+float64[] Qtt_hat
+float64[] Vt_hat
 string group_name
 int64 t
 ---
@@ -315,6 +336,6 @@ float64 if_collide
 
 
 
-(provide :yumi_collision_checking/yumi_execute "b1adf680c6857c95eac390b17b06c828")
+(provide :yumi_collision_checking/yumi_execute "b54a140b3b42b89260ec4d48caa4f3e6")
 
 

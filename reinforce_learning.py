@@ -7,6 +7,16 @@ from models import DDPG
 from environment import Environment
 from replayBuffer import ReplayBuffer
 from utils.ioUtils import resume_model
+import argparse
+import os
+import time
+
+def unpack_rewards(rewards):
+    reward = rewards['reward']
+    Rsim = rewards['Rsim']
+    Robs = rewards['Robs']
+    Rcstr = rewards['Rcstr']
+    return reward, Rsim, Robs, Rcstr
 
 # Runs policy for X episodes and returns average reward
 # A fixed seed is used for the eval environment
@@ -15,20 +25,31 @@ def eval_policy(policy, env, seed, group_name, eval_episodes=5):
     eval_env.seed(seed + 100)
 
     avg_reward = 0.
+    avg_Rsim = 0.
+    avg_Robs = 0.
+    avg_Rcstr = 0.
     for i in range(eval_episodes):
         print(f"Eval episode {i} / {eval_episodes}")
         start = time.time()
         state, done = eval_env.reset(group_name), False
         while not done:
             action = policy.select_action(state)
-            state, reward, done = eval_env.step(action,group_name)
+            state, rewards, done = eval_env.step(action,group_name)
+            reward,Rsim,Robs,Rcstr = unpack_rewards(rewards)
             avg_reward += reward
+            avg_Rsim += Rsim
+            avg_Robs += Robs
+            avg_Rcstr += Rcstr
         end = time.time()
 
     avg_reward /= eval_episodes
+    avg_Rsim /= eval_episodes
+    avg_Robs /= eval_episodes
+    avg_Rcstr /= eval_episodes
 
     print("---------------------------------------")
-    print(f"Env {group_name}, Evaluation over {eval_episodes} episodes: {avg_reward:.3f}")
+    print(f"Env {group_name}, Evaluation over {eval_episodes} episodes Reward: {avg_reward:.3f}\
+        Rsim: {avg_Rsim:.3f} Robs: {avg_Robs:.3f} Rcstr: {avg_Rcstr:.3f} ")
     print("---------------------------------------")
     return avg_reward
 
@@ -39,7 +60,7 @@ if __name__ == "__main__":
     parser.add_argument("--policy", default="DDPG")                  # Policy name (TD3, DDPG or OurDDPG)
     parser.add_argument("--env", default="YuMi")                   # Our implementation of YuMi robot enironment
     parser.add_argument("--seed", default=0, type=int)              # Sets Gym, PyTorch and Numpy seeds
-    parser.add_argument("--start_timesteps", default=2e3, type=int) # Time steps initial random policy is used, default 25e3
+    parser.add_argument("--start_timesteps", default=1e4, type=int) # Time steps initial random policy is used, default 25e3
     parser.add_argument("--eval_freq", default=5e3, type=int)       # How often (time steps) we evaluate
     parser.add_argument("--max_timesteps", default=1e6, type=int)   # Max time steps to run environment
     parser.add_argument("--expl_noise", default=1e-3)                # Std of Gaussian exploration noise, default 0.1
@@ -55,7 +76,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # Options
     state_dim =28*2+38*2
-    action_dim = 38  #(7*2+12*2) 
+    action_dim = 14  #(7*2+12*2) 
+    max_action = 3.1415
     group_name = 'fengren.bag'
     device_list = '0'
     checkpoint = None
@@ -75,10 +97,6 @@ if __name__ == "__main__":
     os.environ["CUDA_VISIBLE_DEVICES"]=device_list
     # Device setting
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    # init base network
-    model = lstm(input_size=num_joints*2).to(device)
-    if checkpoint != None:
-        resume_model(model,checkpoint)
 
     env = Environment()
 
@@ -90,6 +108,7 @@ if __name__ == "__main__":
     kwargs = {
         "state_dim": state_dim,
         "action_dim": action_dim,
+        "max_action": max_action,
         "discount": args.discount,
         "tau": args.tau,
     }
@@ -108,13 +127,13 @@ if __name__ == "__main__":
         policy_file = file_name if args.load_model == "default" else args.load_model
         policy.load(f"./checkpoint/{policy_file}")
 
-    replay_buffer = ReplayBuffer(state_dim,action_dim,length)
+    replay_buffer = ReplayBuffer(state_dim,action_dim)
     
     # Evaluate untrained policy
     evaluations = []
     # evaluations = [eval_policy(policy, env, args.seed, group_name)]
 
-    state, done = env.reset(group_name), False
+    # state, done = env.reset(group_name), False
     episode_reward = 0
     episode_Rsim = 0
     episode_Robs  = 0
@@ -123,7 +142,7 @@ if __name__ == "__main__":
     episode_num = 0
 
     for group_name in [group_name]:
-        state = env.reset(group_name)
+        state, done = env.reset(group_name), False
         for t in range(int(args.max_timesteps)):
             
             episode_timesteps += 1
@@ -131,18 +150,16 @@ if __name__ == "__main__":
             # Select action randomly or according to policy
             if t < args.start_timesteps:
                 action = env.sample(group_name)
+                # print(f"Sampled action: {action}")
             else:
                 action = (
-                    policy.select_action(state)
-                    + np.random.normal(0, 1 * args.expl_noise, size=(length,action_dim))
-                )
+                    policy.select_action(np.array(state))
+                    + np.random.normal(0, max_action * args.expl_noise, size=action_dim)
+                ).clip(-max_action, max_action)
 
             # Perform action
             next_state, rewards, done = env.step(action,group_name)
-            reward = rewards['reward']
-            Rsim = rewards['Rsim']
-            Robs = rewards['Robs']
-            Rcstr = rewards['Rcstr']
+            reward, Rsim, Robs, Rcstr = unpack_rewards(rewards)
 
             # Store data in replay buffer
             replay_buffer.add(state, action, next_state, reward, float(done))
@@ -165,6 +182,9 @@ if __name__ == "__main__":
                 # Reset environment
                 state, done = env.reset(group_name), False
                 episode_reward = 0
+                episode_Rsim =0
+                episode_Robs =0
+                episode_Rcstr =0
                 episode_timesteps = 0
                 episode_num += 1 
 

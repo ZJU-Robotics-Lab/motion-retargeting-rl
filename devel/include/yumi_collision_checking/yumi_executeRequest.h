@@ -25,13 +25,15 @@ struct yumi_executeRequest_
 
   yumi_executeRequest_()
     : command()
-    , Qt()
+    , Qtt_hat()
+    , Vt_hat()
     , group_name()
     , t(0)  {
     }
   yumi_executeRequest_(const ContainerAllocator& _alloc)
     : command(_alloc)
-    , Qt(_alloc)
+    , Qtt_hat(_alloc)
+    , Vt_hat(_alloc)
     , group_name(_alloc)
     , t(0)  {
   (void)_alloc;
@@ -42,8 +44,11 @@ struct yumi_executeRequest_
    typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _command_type;
   _command_type command;
 
-   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _Qt_type;
-  _Qt_type Qt;
+   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _Qtt_hat_type;
+  _Qtt_hat_type Qtt_hat;
+
+   typedef std::vector<double, typename ContainerAllocator::template rebind<double>::other >  _Vt_hat_type;
+  _Vt_hat_type Vt_hat;
 
    typedef std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other >  _group_name_type;
   _group_name_type group_name;
@@ -129,12 +134,12 @@ struct MD5Sum< ::yumi_collision_checking::yumi_executeRequest_<ContainerAllocato
 {
   static const char* value()
   {
-    return "055e48d58323703c4e4f4ed5d703b3a3";
+    return "4242fadbc2608cbc955e93a81f98d4ba";
   }
 
   static const char* value(const ::yumi_collision_checking::yumi_executeRequest_<ContainerAllocator>&) { return value(); }
-  static const uint64_t static_value1 = 0x055e48d58323703cULL;
-  static const uint64_t static_value2 = 0x4e4f4ed5d703b3a3ULL;
+  static const uint64_t static_value1 = 0x4242fadbc2608cbcULL;
+  static const uint64_t static_value2 = 0x955e93a81f98d4baULL;
 };
 
 template<class ContainerAllocator>
@@ -154,7 +159,8 @@ struct Definition< ::yumi_collision_checking::yumi_executeRequest_<ContainerAllo
   static const char* value()
   {
     return "string command\n\
-float64[] Qt\n\
+float64[] Qtt_hat\n\
+float64[] Vt_hat\n\
 string group_name\n\
 int64 t\n\
 ";
@@ -176,7 +182,8 @@ namespace serialization
     template<typename Stream, typename T> inline static void allInOne(Stream& stream, T m)
     {
       stream.next(m.command);
-      stream.next(m.Qt);
+      stream.next(m.Qtt_hat);
+      stream.next(m.Vt_hat);
       stream.next(m.group_name);
       stream.next(m.t);
     }
@@ -199,11 +206,17 @@ struct Printer< ::yumi_collision_checking::yumi_executeRequest_<ContainerAllocat
   {
     s << indent << "command: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.command);
-    s << indent << "Qt[]" << std::endl;
-    for (size_t i = 0; i < v.Qt.size(); ++i)
+    s << indent << "Qtt_hat[]" << std::endl;
+    for (size_t i = 0; i < v.Qtt_hat.size(); ++i)
     {
-      s << indent << "  Qt[" << i << "]: ";
-      Printer<double>::stream(s, indent + "  ", v.Qt[i]);
+      s << indent << "  Qtt_hat[" << i << "]: ";
+      Printer<double>::stream(s, indent + "  ", v.Qtt_hat[i]);
+    }
+    s << indent << "Vt_hat[]" << std::endl;
+    for (size_t i = 0; i < v.Vt_hat.size(); ++i)
+    {
+      s << indent << "  Vt_hat[" << i << "]: ";
+      Printer<double>::stream(s, indent + "  ", v.Vt_hat[i]);
     }
     s << indent << "group_name: ";
     Printer<std::basic_string<char, std::char_traits<char>, typename ContainerAllocator::template rebind<char>::other > >::stream(s, indent + "  ", v.group_name);

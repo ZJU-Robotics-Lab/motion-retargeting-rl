@@ -81,7 +81,7 @@ class YumiApiServer
             std::vector<double> Vt_hat = request.Vt_hat;
             std::vector<double> Qtt_hat = request.Qtt_hat;
             std::vector<double> Qt_hat(Vt_hat.size());
-            double dt = 1.0/15.0;
+            double dt = 1.0;
             for (int i = 0; i < Vt_hat.size(); i++)
             {
                 Qt_hat[i] = Qtt_hat[i]+Vt_hat[i]*dt; 

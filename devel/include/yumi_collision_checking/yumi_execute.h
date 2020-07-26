@@ -40,7 +40,7 @@ template<>
 struct MD5Sum< ::yumi_collision_checking::yumi_execute > {
   static const char* value()
   {
-    return "b1adf680c6857c95eac390b17b06c828";
+    return "b54a140b3b42b89260ec4d48caa4f3e6";
   }
 
   static const char* value(const ::yumi_collision_checking::yumi_execute&) { return value(); }

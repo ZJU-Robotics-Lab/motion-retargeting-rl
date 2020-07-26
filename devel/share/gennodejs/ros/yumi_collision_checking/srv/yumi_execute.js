@@ -22,7 +22,8 @@ class yumi_executeRequest {
     if (initObj === null) {
       // initObj === null is a special case for deserialization where we don't initialize fields
       this.command = null;
-      this.Qt = null;
+      this.Qtt_hat = null;
+      this.Vt_hat = null;
       this.group_name = null;
       this.t = null;
     }
@@ -33,11 +34,17 @@ class yumi_executeRequest {
       else {
         this.command = '';
       }
-      if (initObj.hasOwnProperty('Qt')) {
-        this.Qt = initObj.Qt
+      if (initObj.hasOwnProperty('Qtt_hat')) {
+        this.Qtt_hat = initObj.Qtt_hat
       }
       else {
-        this.Qt = [];
+        this.Qtt_hat = [];
+      }
+      if (initObj.hasOwnProperty('Vt_hat')) {
+        this.Vt_hat = initObj.Vt_hat
+      }
+      else {
+        this.Vt_hat = [];
       }
       if (initObj.hasOwnProperty('group_name')) {
         this.group_name = initObj.group_name
@@ -58,8 +65,10 @@ class yumi_executeRequest {
     // Serializes a message object of type yumi_executeRequest
     // Serialize message field [command]
     bufferOffset = _serializer.string(obj.command, buffer, bufferOffset);
-    // Serialize message field [Qt]
-    bufferOffset = _arraySerializer.float64(obj.Qt, buffer, bufferOffset, null);
+    // Serialize message field [Qtt_hat]
+    bufferOffset = _arraySerializer.float64(obj.Qtt_hat, buffer, bufferOffset, null);
+    // Serialize message field [Vt_hat]
+    bufferOffset = _arraySerializer.float64(obj.Vt_hat, buffer, bufferOffset, null);
     // Serialize message field [group_name]
     bufferOffset = _serializer.string(obj.group_name, buffer, bufferOffset);
     // Serialize message field [t]
@@ -73,8 +82,10 @@ class yumi_executeRequest {
     let data = new yumi_executeRequest(null);
     // Deserialize message field [command]
     data.command = _deserializer.string(buffer, bufferOffset);
-    // Deserialize message field [Qt]
-    data.Qt = _arrayDeserializer.float64(buffer, bufferOffset, null)
+    // Deserialize message field [Qtt_hat]
+    data.Qtt_hat = _arrayDeserializer.float64(buffer, bufferOffset, null)
+    // Deserialize message field [Vt_hat]
+    data.Vt_hat = _arrayDeserializer.float64(buffer, bufferOffset, null)
     // Deserialize message field [group_name]
     data.group_name = _deserializer.string(buffer, bufferOffset);
     // Deserialize message field [t]
@@ -85,9 +96,10 @@ class yumi_executeRequest {
   static getMessageSize(object) {
     let length = 0;
     length += object.command.length;
-    length += 8 * object.Qt.length;
+    length += 8 * object.Qtt_hat.length;
+    length += 8 * object.Vt_hat.length;
     length += object.group_name.length;
-    return length + 20;
+    return length + 24;
   }
 
   static datatype() {
@@ -97,14 +109,15 @@ class yumi_executeRequest {
 
   static md5sum() {
     //Returns md5sum for a message object
-    return '055e48d58323703c4e4f4ed5d703b3a3';
+    return '4242fadbc2608cbc955e93a81f98d4ba';
   }
 
   static messageDefinition() {
     // Returns full string definition for message
     return `
     string command
-    float64[] Qt
+    float64[] Qtt_hat
+    float64[] Vt_hat
     string group_name
     int64 t
     
@@ -124,11 +137,18 @@ class yumi_executeRequest {
       resolved.command = ''
     }
 
-    if (msg.Qt !== undefined) {
-      resolved.Qt = msg.Qt;
+    if (msg.Qtt_hat !== undefined) {
+      resolved.Qtt_hat = msg.Qtt_hat;
     }
     else {
-      resolved.Qt = []
+      resolved.Qtt_hat = []
+    }
+
+    if (msg.Vt_hat !== undefined) {
+      resolved.Vt_hat = msg.Vt_hat;
+    }
+    else {
+      resolved.Vt_hat = []
     }
 
     if (msg.group_name !== undefined) {
@@ -344,6 +364,6 @@ class yumi_executeResponse {
 module.exports = {
   Request: yumi_executeRequest,
   Response: yumi_executeResponse,
-  md5sum() { return 'b1adf680c6857c95eac390b17b06c828'; },
+  md5sum() { return 'b54a140b3b42b89260ec4d48caa4f3e6'; },
   datatype() { return 'yumi_collision_checking/yumi_execute'; }
 };

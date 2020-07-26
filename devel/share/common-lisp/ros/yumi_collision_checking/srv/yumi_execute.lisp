@@ -12,9 +12,14 @@
     :initarg :command
     :type cl:string
     :initform "")
-   (Qt
-    :reader Qt
-    :initarg :Qt
+   (Qtt_hat
+    :reader Qtt_hat
+    :initarg :Qtt_hat
+    :type (cl:vector cl:float)
+   :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0))
+   (Vt_hat
+    :reader Vt_hat
+    :initarg :Vt_hat
     :type (cl:vector cl:float)
    :initform (cl:make-array 0 :element-type 'cl:float :initial-element 0.0))
    (group_name
@@ -42,10 +47,15 @@
   (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader yumi_collision_checking-srv:command-val is deprecated.  Use yumi_collision_checking-srv:command instead.")
   (command m))
 
-(cl:ensure-generic-function 'Qt-val :lambda-list '(m))
-(cl:defmethod Qt-val ((m <yumi_execute-request>))
-  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader yumi_collision_checking-srv:Qt-val is deprecated.  Use yumi_collision_checking-srv:Qt instead.")
-  (Qt m))
+(cl:ensure-generic-function 'Qtt_hat-val :lambda-list '(m))
+(cl:defmethod Qtt_hat-val ((m <yumi_execute-request>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader yumi_collision_checking-srv:Qtt_hat-val is deprecated.  Use yumi_collision_checking-srv:Qtt_hat instead.")
+  (Qtt_hat m))
+
+(cl:ensure-generic-function 'Vt_hat-val :lambda-list '(m))
+(cl:defmethod Vt_hat-val ((m <yumi_execute-request>))
+  (roslisp-msg-protocol:msg-deprecation-warning "Using old-style slot reader yumi_collision_checking-srv:Vt_hat-val is deprecated.  Use yumi_collision_checking-srv:Vt_hat instead.")
+  (Vt_hat m))
 
 (cl:ensure-generic-function 'group_name-val :lambda-list '(m))
 (cl:defmethod group_name-val ((m <yumi_execute-request>))
@@ -64,7 +74,7 @@
     (cl:write-byte (cl:ldb (cl:byte 8 16) __ros_str_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 24) __ros_str_len) ostream))
   (cl:map cl:nil #'(cl:lambda (c) (cl:write-byte (cl:char-code c) ostream)) (cl:slot-value msg 'command))
-  (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'Qt))))
+  (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'Qtt_hat))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 16) __ros_arr_len) ostream)
@@ -78,7 +88,22 @@
     (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream)))
-   (cl:slot-value msg 'Qt))
+   (cl:slot-value msg 'Qtt_hat))
+  (cl:let ((__ros_arr_len (cl:length (cl:slot-value msg 'Vt_hat))))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) __ros_arr_len) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) __ros_arr_len) ostream))
+  (cl:map cl:nil #'(cl:lambda (ele) (cl:let ((bits (roslisp-utils:encode-double-float-bits ele)))
+    (cl:write-byte (cl:ldb (cl:byte 8 0) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 8) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 16) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 24) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 32) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 40) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 48) bits) ostream)
+    (cl:write-byte (cl:ldb (cl:byte 8 56) bits) ostream)))
+   (cl:slot-value msg 'Vt_hat))
   (cl:let ((__ros_str_len (cl:length (cl:slot-value msg 'group_name))))
     (cl:write-byte (cl:ldb (cl:byte 8 0) __ros_str_len) ostream)
     (cl:write-byte (cl:ldb (cl:byte 8 8) __ros_str_len) ostream)
@@ -111,8 +136,26 @@
     (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 16) __ros_arr_len) (cl:read-byte istream))
     (cl:setf (cl:ldb (cl:byte 8 24) __ros_arr_len) (cl:read-byte istream))
-  (cl:setf (cl:slot-value msg 'Qt) (cl:make-array __ros_arr_len))
-  (cl:let ((vals (cl:slot-value msg 'Qt)))
+  (cl:setf (cl:slot-value msg 'Qtt_hat) (cl:make-array __ros_arr_len))
+  (cl:let ((vals (cl:slot-value msg 'Qtt_hat)))
+    (cl:dotimes (i __ros_arr_len)
+    (cl:let ((bits 0))
+      (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 8) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 16) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 24) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 32) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 40) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 48) bits) (cl:read-byte istream))
+      (cl:setf (cl:ldb (cl:byte 8 56) bits) (cl:read-byte istream))
+    (cl:setf (cl:aref vals i) (roslisp-utils:decode-double-float-bits bits))))))
+  (cl:let ((__ros_arr_len 0))
+    (cl:setf (cl:ldb (cl:byte 8 0) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 8) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 16) __ros_arr_len) (cl:read-byte istream))
+    (cl:setf (cl:ldb (cl:byte 8 24) __ros_arr_len) (cl:read-byte istream))
+  (cl:setf (cl:slot-value msg 'Vt_hat) (cl:make-array __ros_arr_len))
+  (cl:let ((vals (cl:slot-value msg 'Vt_hat)))
     (cl:dotimes (i __ros_arr_len)
     (cl:let ((bits 0))
       (cl:setf (cl:ldb (cl:byte 8 0) bits) (cl:read-byte istream))
@@ -152,20 +195,21 @@
   "yumi_collision_checking/yumi_executeRequest")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<yumi_execute-request>)))
   "Returns md5sum for a message object of type '<yumi_execute-request>"
-  "b1adf680c6857c95eac390b17b06c828")
+  "b54a140b3b42b89260ec4d48caa4f3e6")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'yumi_execute-request)))
   "Returns md5sum for a message object of type 'yumi_execute-request"
-  "b1adf680c6857c95eac390b17b06c828")
+  "b54a140b3b42b89260ec4d48caa4f3e6")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<yumi_execute-request>)))
   "Returns full string definition for message of type '<yumi_execute-request>"
-  (cl:format cl:nil "string command~%float64[] Qt~%string group_name~%int64 t~%~%~%"))
+  (cl:format cl:nil "string command~%float64[] Qtt_hat~%float64[] Vt_hat~%string group_name~%int64 t~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql 'yumi_execute-request)))
   "Returns full string definition for message of type 'yumi_execute-request"
-  (cl:format cl:nil "string command~%float64[] Qt~%string group_name~%int64 t~%~%~%"))
+  (cl:format cl:nil "string command~%float64[] Qtt_hat~%float64[] Vt_hat~%string group_name~%int64 t~%~%~%"))
 (cl:defmethod roslisp-msg-protocol:serialization-length ((msg <yumi_execute-request>))
   (cl:+ 0
      4 (cl:length (cl:slot-value msg 'command))
-     4 (cl:reduce #'cl:+ (cl:slot-value msg 'Qt) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
+     4 (cl:reduce #'cl:+ (cl:slot-value msg 'Qtt_hat) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
+     4 (cl:reduce #'cl:+ (cl:slot-value msg 'Vt_hat) :key #'(cl:lambda (ele) (cl:declare (cl:ignorable ele)) (cl:+ 8)))
      4 (cl:length (cl:slot-value msg 'group_name))
      8
 ))
@@ -173,7 +217,8 @@
   "Converts a ROS message object to a list"
   (cl:list 'yumi_execute-request
     (cl:cons ':command (command msg))
-    (cl:cons ':Qt (Qt msg))
+    (cl:cons ':Qtt_hat (Qtt_hat msg))
+    (cl:cons ':Vt_hat (Vt_hat msg))
     (cl:cons ':group_name (group_name msg))
     (cl:cons ':t (t msg))
 ))
@@ -491,10 +536,10 @@
   "yumi_collision_checking/yumi_executeResponse")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql '<yumi_execute-response>)))
   "Returns md5sum for a message object of type '<yumi_execute-response>"
-  "b1adf680c6857c95eac390b17b06c828")
+  "b54a140b3b42b89260ec4d48caa4f3e6")
 (cl:defmethod roslisp-msg-protocol:md5sum ((type (cl:eql 'yumi_execute-response)))
   "Returns md5sum for a message object of type 'yumi_execute-response"
-  "b1adf680c6857c95eac390b17b06c828")
+  "b54a140b3b42b89260ec4d48caa4f3e6")
 (cl:defmethod roslisp-msg-protocol:message-definition ((type (cl:eql '<yumi_execute-response>)))
   "Returns full string definition for message of type '<yumi_execute-response>"
   (cl:format cl:nil "float64[] xt_hat~%float64[] Qt_hat~%float64[] xt~%float64[] Qt~%float64[] x_next~%float64[] Q_next~%float64 if_collide~%~%~%"))

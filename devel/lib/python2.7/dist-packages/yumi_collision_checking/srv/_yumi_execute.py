@@ -7,16 +7,17 @@ import struct
 
 
 class yumi_executeRequest(genpy.Message):
-  _md5sum = "055e48d58323703c4e4f4ed5d703b3a3"
+  _md5sum = "4242fadbc2608cbc955e93a81f98d4ba"
   _type = "yumi_collision_checking/yumi_executeRequest"
   _has_header = False #flag to mark the presence of a Header object
   _full_text = """string command
-float64[] Qt
+float64[] Qtt_hat
+float64[] Vt_hat
 string group_name
 int64 t
 """
-  __slots__ = ['command','Qt','group_name','t']
-  _slot_types = ['string','float64[]','string','int64']
+  __slots__ = ['command','Qtt_hat','Vt_hat','group_name','t']
+  _slot_types = ['string','float64[]','float64[]','string','int64']
 
   def __init__(self, *args, **kwds):
     """
@@ -26,7 +27,7 @@ int64 t
     changes.  You cannot mix in-order arguments and keyword arguments.
 
     The available fields are:
-       command,Qt,group_name,t
+       command,Qtt_hat,Vt_hat,group_name,t
 
     :param args: complete set of field values, in .msg order
     :param kwds: use keyword arguments corresponding to message field names
@@ -37,15 +38,18 @@ int64 t
       #message fields cannot be None, assign default values for those that are
       if self.command is None:
         self.command = ''
-      if self.Qt is None:
-        self.Qt = []
+      if self.Qtt_hat is None:
+        self.Qtt_hat = []
+      if self.Vt_hat is None:
+        self.Vt_hat = []
       if self.group_name is None:
         self.group_name = ''
       if self.t is None:
         self.t = 0
     else:
       self.command = ''
-      self.Qt = []
+      self.Qtt_hat = []
+      self.Vt_hat = []
       self.group_name = ''
       self.t = 0
 
@@ -67,10 +71,14 @@ int64 t
         _x = _x.encode('utf-8')
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
-      length = len(self.Qt)
+      length = len(self.Qtt_hat)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
-      buff.write(struct.pack(pattern, *self.Qt))
+      buff.write(struct.pack(pattern, *self.Qtt_hat))
+      length = len(self.Vt_hat)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(struct.pack(pattern, *self.Vt_hat))
       _x = self.group_name
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -103,7 +111,14 @@ int64 t
       pattern = '<%sd'%length
       start = end
       end += struct.calcsize(pattern)
-      self.Qt = struct.unpack(pattern, str[start:end])
+      self.Qtt_hat = struct.unpack(pattern, str[start:end])
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      end += struct.calcsize(pattern)
+      self.Vt_hat = struct.unpack(pattern, str[start:end])
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -134,10 +149,14 @@ int64 t
         _x = _x.encode('utf-8')
         length = len(_x)
       buff.write(struct.pack('<I%ss'%length, length, _x))
-      length = len(self.Qt)
+      length = len(self.Qtt_hat)
       buff.write(_struct_I.pack(length))
       pattern = '<%sd'%length
-      buff.write(self.Qt.tostring())
+      buff.write(self.Qtt_hat.tostring())
+      length = len(self.Vt_hat)
+      buff.write(_struct_I.pack(length))
+      pattern = '<%sd'%length
+      buff.write(self.Vt_hat.tostring())
       _x = self.group_name
       length = len(_x)
       if python3 or type(_x) == unicode:
@@ -171,7 +190,14 @@ int64 t
       pattern = '<%sd'%length
       start = end
       end += struct.calcsize(pattern)
-      self.Qt = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
+      self.Qtt_hat = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
+      start = end
+      end += 4
+      (length,) = _struct_I.unpack(str[start:end])
+      pattern = '<%sd'%length
+      start = end
+      end += struct.calcsize(pattern)
+      self.Vt_hat = numpy.frombuffer(str[start:end], dtype=numpy.float64, count=length)
       start = end
       end += 4
       (length,) = _struct_I.unpack(str[start:end])
@@ -462,6 +488,6 @@ def _get_struct_d():
     return _struct_d
 class yumi_execute(object):
   _type          = 'yumi_collision_checking/yumi_execute'
-  _md5sum = 'b1adf680c6857c95eac390b17b06c828'
+  _md5sum = 'b54a140b3b42b89260ec4d48caa4f3e6'
   _request_class  = yumi_executeRequest
   _response_class = yumi_executeResponse

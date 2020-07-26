@@ -13,10 +13,10 @@ from yumi_collision_checking.srv import yumi_execute
 from  yumi_collision_checking.srv import yumi_executeRequest 
 from  yumi_collision_checking.srv import yumi_executeResponse
 
-Plb = np.concatenate(YUMI_LOWER_LIMITS,ROBOTHAND_LB,ROBOTHAND_LB)
-Pub = np.concatenate(YUMI_UPPER_LIMITS,ROBOTHAND_UB,ROBOTHAND_UB)
+Plb = np.concatenate([YUMI_LOWER_LIMITS,ROBOTHAND_LB,ROBOTHAND_LB])
+Pub = np.concatenate([YUMI_UPPER_LIMITS,ROBOTHAND_UB,ROBOTHAND_UB])
 
-h5_name = "/media/liweijie/代码和数据/datasets/motionRetargeting/mocap_data_YuMi_affine_exexute2.h5"
+h5_name = "/home/liweijie/projects/sl-rl-motion-retargeting-ws/mocap_data_YuMi_affine_execute2.h5"
 weightVector = np.ones([28])
 weightVector[:14] = 0.2     # elbow is less important
 
@@ -51,16 +51,27 @@ class Environment:
         Robs = 0
         if resp.if_collide == 1.0:
             Robs = -50
-        Rcstr = np.exp(-(np.clip(Qt_hat-Pub,0,None)*np.clip(Qt_hat-Pub,0,None)+np.clip(Plb-Qt_hat,0,None)*np.clip(Plb-Qt_hat,0,None)))
+        Rcstr = np.exp(-np.sum(np.clip(Qt_hat-Pub,0,None)*np.clip(Qt_hat-Pub,0,None)+np.clip(Plb-Qt_hat,0,None)*np.clip(Plb-Qt_hat,0,None)))
         reward = Rsim + Robs + Rcstr
         return {'reward':reward,'Rsim':Rsim,'Robs':Robs,'Rcstr':Rcstr}
 
-    def determineIfDone(self,resp):
+    def getVtRef(self,group_name):
+        t = self.t
+        if t==0: t=1
+        x, Q = self.h5parser.parse(group_name)
+        xtt, Qtt = x[t-1], Q[t-1]
+        xt, Qt = x[t], Q[t]
+        Vt_ref = Qt - Qtt
+        return Vt_ref
+
+    def determineIfDone(self,resp,group_name):
         done = False
         x, Q = self.h5parser.parse(group_name)
         max_time = len(Q)
-        if resp.if_collide: done = True
-        elif self.t >=  max_time: done = True
+        if resp.if_collide == 1.0: 
+            done = True
+        elif self.t >=  max_time-1: 
+            done = True
         return done
 
     def reset(self,group_name):
@@ -82,7 +93,9 @@ class Environment:
         return initial_state
 
     def step(self,Vt_hat, group_name):
-        Vt_hat = list(Vt_hat)
+        # print(f"Step {self.t}")
+        Vt_ref = self.getVtRef(group_name)
+        Vt_hat = list(Vt_hat) + list(Vt_ref[14:]) # Use the reference glove angle
         # Construct the request
         command = "move"
         req = yumi_executeRequest(command,self.Q_state,Vt_hat,group_name,self.t)
@@ -96,17 +109,13 @@ class Environment:
         # Calculate rewards
         rewards = self.calculateReward(resp)
         # Determine if done
-        done = self.determineIfDone(resp)
+        done = self.determineIfDone(resp,group_name)
         return next_state, rewards, done
 
     def sample(self,group_name):
-        t = self.t
-        if t==0: t=1
         # Random sample an action
-        x, Q = self.h5parser.parse(group_name)
-        xtt, Qtt = x[t-1], Q[t-1]
-        xt, Qt = x[t], Q[t]
-        Vt_ref = Qt - Qtt
-        scale = np.random.rand(Vt_ref.shape) + 0.5  # scale is in 0.5~1.5
+        Vt_ref = self.getVtRef(group_name)
+        scale = np.random.rand(*Vt_ref.shape) + 0.5  # scale is in 0.5~1.5
         Vt_hat = scale * Vt_ref
+        Vt_hat = Vt_hat[:14]     # Only use the joints of arms
         return Vt_hat
