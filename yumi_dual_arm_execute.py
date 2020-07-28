@@ -103,8 +103,8 @@ class h5Writer:
 
 
 rospy.init_node('yumi_dual_arm_execute.py', anonymous=True)
-h5_name = "/media/liweijie/代码和数据/datasets/motionRetargeting/mocap_data_YuMi_affine.h5"
-out_h5_name = "/media/liweijie/代码和数据/datasets/motionRetargeting/mocap_data_YuMi_affine_execute.h5"
+h5_name = "mocap_data_YuMi_affine.h5"
+out_h5_name = "mocap_data_YuMi_affine_execute.h5"
 h5parser = h5Parser(h5_name)
 h5writer = h5Writer(out_h5_name)
 group_name = "fengren.bag"

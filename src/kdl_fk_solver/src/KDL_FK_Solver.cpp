@@ -387,34 +387,32 @@ int main(int argc, char **argv)
   KDL::ChainFkSolverPos_recursive right_fk_solver = fk_solver.setup_right_kdl();
 
   // New joint angles
-  Matrix<double, 7, 1> q_test = Matrix<double, 7, 1>::Zero();
-  q_test(0) = 0.6;
-  q_test(1) = 1.5;
-  q_test(2) = 0.1;
-  q_test(3) = 1.5;
-  q_test(4) = 0.2;
-  q_test(5) = 1.2;
-  q_test(6) = 2.3;
+  double a_left[7] = {-1.56,-1.35,1.76,0.0,0.0,0.0,1.57};
+  double a_right[7] = {1.56,-1.35,-1.76,0.0,0.0,0.0,-1.57};
+  std::vector<double> v_left(std::begin(a_left),std::end(a_left));
+  std::vector<double> v_right(std::begin(a_right),std::end(a_right));
+  Matrix<double, 7, 1> q_left(v_left.data());
+  Matrix<double, 7, 1> q_right(v_right.data());
   
   // Perform FK
-  Vector3d l_wrist_pos = fk_solver.return_wrist_pos(left_fk_solver, q_test, true);
-  Vector3d r_wrist_pos = fk_solver.return_wrist_pos(right_fk_solver, q_test, false);
+  Vector3d l_wrist_pos = fk_solver.return_wrist_pos(left_fk_solver, q_left, true);
+  Vector3d r_wrist_pos = fk_solver.return_wrist_pos(right_fk_solver, q_right, false);
 
-  Vector3d l_elbow_pos = fk_solver.return_elbow_pos(left_fk_solver, q_test, true);
-  Vector3d r_elbow_pos = fk_solver.return_elbow_pos(right_fk_solver, q_test, false);
+  Vector3d l_elbow_pos = fk_solver.return_elbow_pos(left_fk_solver, q_left, true);
+  Vector3d r_elbow_pos = fk_solver.return_elbow_pos(right_fk_solver, q_right, false);
 
-  Vector3d l_shoulder_pos = fk_solver.return_shoulder_pos(left_fk_solver, q_test, true);
-  Vector3d r_shoulder_pos = fk_solver.return_shoulder_pos(right_fk_solver, q_test, false);
-  Vector3d r_joint2_pos = fk_solver.return_pos(right_fk_solver,q_test, fk_solver.r_num_joint2_seg);
-  Matrix3d r_joint2_rot = fk_solver.return_ori(right_fk_solver,q_test,fk_solver.r_num_joint2_seg);
-  Matrix3d l_elbow_rot = fk_solver.return_ori(left_fk_solver,q_test,fk_solver.l_num_elbow_seg);
-  Matrix3d r_elbow_rot = fk_solver.return_ori(right_fk_solver,q_test,fk_solver.r_num_elbow_seg);
+  Vector3d l_shoulder_pos = fk_solver.return_shoulder_pos(left_fk_solver, q_left, true);
+  Vector3d r_shoulder_pos = fk_solver.return_shoulder_pos(right_fk_solver, q_left, false);
+  Vector3d r_joint2_pos = fk_solver.return_pos(right_fk_solver,q_right, fk_solver.r_num_joint2_seg);
+  Matrix3d r_joint2_rot = fk_solver.return_ori(right_fk_solver,q_right,fk_solver.r_num_joint2_seg);
+  Matrix3d l_elbow_rot = fk_solver.return_ori(left_fk_solver,q_left,fk_solver.l_num_elbow_seg);
+  Matrix3d r_elbow_rot = fk_solver.return_ori(right_fk_solver,q_right,fk_solver.r_num_elbow_seg);
 
-  Matrix3d l_wrist_rot = fk_solver.return_wrist_ori(left_fk_solver, q_test, true);
-  Matrix3d r_wrist_rot = fk_solver.return_wrist_ori(right_fk_solver, q_test, false);
+  Matrix3d l_wrist_rot = fk_solver.return_wrist_ori(left_fk_solver, q_left, true);
+  Matrix3d r_wrist_rot = fk_solver.return_wrist_ori(right_fk_solver, q_right, false);
 
-  Matrix3d l_shoulder_rot = fk_solver.return_shoulder_ori(left_fk_solver, q_test, true);
-  Matrix3d r_shoulder_rot = fk_solver.return_shoulder_ori(right_fk_solver, q_test, false);
+  Matrix3d l_shoulder_rot = fk_solver.return_shoulder_ori(left_fk_solver, q_left, true);
+  Matrix3d r_shoulder_rot = fk_solver.return_shoulder_ori(right_fk_solver, q_right, false);
   // convert rotation matrix to quaternion for ease of validation in RViz
   Quaterniond l_elbow_quat(l_elbow_rot);
   Quaterniond l_wrist_quat(l_wrist_rot);

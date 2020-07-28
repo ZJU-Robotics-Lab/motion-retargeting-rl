@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import rospy
 import numpy as np
-from models import DDPG
+from models import DDPG,TD3
 from environment import Environment
 from replayBuffer import ReplayBuffer
 from utils.ioUtils import resume_model
@@ -57,7 +57,7 @@ def eval_policy(policy, env, seed, group_name, eval_episodes=5):
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser()
-    parser.add_argument("--policy", default="DDPG")                  # Policy name (TD3, DDPG or OurDDPG)
+    parser.add_argument("--policy", default="TD3")                  # Policy name (TD3, DDPG or OurDDPG)
     parser.add_argument("--env", default="YuMi")                   # Our implementation of YuMi robot enironment
     parser.add_argument("--seed", default=0, type=int)              # Sets Gym, PyTorch and Numpy seeds
     parser.add_argument("--start_timesteps", default=1e4, type=int) # Time steps initial random policy is used, default 25e3
